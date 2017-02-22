@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Upload Picture
+		</title>
+	</head>
+
+	<body>
+		<header>
+			<div class = 'heading'>
+				<h2 class = 'heading2'>
+					Uploaded Pictures
+				</h2>
+			</div>
+		</header>
+		<main>
+			<body>
+    			{% for image in images %}
+        		<a class="image" href="{{ image.src }}" style="width: {{ image.width }}px; height: {{ image.height }}px">
+            	<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="{{ image.src }}?w={{ image.width }}&amp;h={{ image.height }}" width="{{ image.width }}" height="{{ image.height }}" />
+        		</a>
+    			{% endfor %}
+			</body>
+		</main>
+	</body>

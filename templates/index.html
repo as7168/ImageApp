@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>SnappingPanchod</title>
+		<meta charset='UTF-8'>
+		<title>Snapose Log In</title>
+
+		<link rel="stylesheet" type="text/css" href="static/css/style2.css">
 	</head>
 	<body>
-		<header>
-			<div class="header-container">
-				<h1 id="id1" class="title">Snapping Kanjars</h1>
+		<main>
+			<div class='heading'>
+				<h1>SNAPOSE</h1>
 			</div>
-		</header>
-		<main class="main-class">
-			<div class="container1">
-				<div class="section-content">
-					<h2 class="heading2">You can upload as many fudu pictures here as you want</h2>
-					<a href="">Upload</a>
-				</div>
+			<div class = 'login-page'>
+				<form method="POST">
+				<input type='text' placeholder='username'/><br>
+				<input type= 'text' placeholder='password'/><br><br>
+				<button type="submit">Login</button>
+				</form>
+				<p class= 'message'>Not Registered?<a href="/register">Create an account</a></p>
+			</div>		
+
+			<div class = 'messages', style = 'min-height: 100% width: 80%'>
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						{% for message in messages %}
+							{{ message }}
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+				
 			</div>
 			
-			<div class="picture">
-				<img src="C:\Users\Singh\Google Drive\NYU Poly Grad 2018\Spring2017Semester2\CSGY9163-ApplicationSecurity-KellyLum\App\static\img\kanjar.png">
-			</div>
 		</main>
 
 	</body>

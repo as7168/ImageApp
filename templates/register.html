@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='UTF-8'>
+		<title>Snapose Sign Up</title>
+
+		<link rel="stylesheet" type="text/css" href="static/css/style2.css">
+	</head>
+	<body>
+		<header>
+			<div class='heading'>
+				<h1>SNAPOSE</h1>
+			</div>
+		</header>
+		<main>
+			<div class = 'login-page'>
+				<div class = 'form'>
+					<form method="POST" class= 'signup-form'>
+						<input type='text' placeholder='firstname' name="fname" /><br><br>
+						<input type='text' placeholder="lastname" name="lname" /><br><br>
+						<input type='text' placeholder="username" name="user" /><br><br>
+						<input type= 'text' placeholder='password' name="paswd" /><br><br>
+						<button type='submit' align='center'>Register</button>
+						<p class= 'message'>Already Registered?<a href="/">Log In</a></p>
+					</form>
+				</div> 
+			</div>		
+
+			<div class = 'messages' align="center" style = 'min-height: 100% width: 80%'>
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						{% for message in messages %}
+							{{ message }}
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+				
+			</div>
+			
+		</main>
+
+	</body>
+</html>

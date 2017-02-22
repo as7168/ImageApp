@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Snapose</title>
+	</head>
+		<header>
+			<div class="header-container">
+				<h1 id="id1" class="title">Snapose</h1>
+				<a href="/">Upload Images</a>
+			</div>
+			<link rel="stylesheet" type="text/css" href="/static/css/style2.css">
+		</header>
+		<body>
+			<div class='pages'>
+				{{pagination.info}}
+				{{pagination.links}}
+			</div>
+			<hr>
+			
+			{% for image in images %}
+			<div class='img' style="border: 1px outset; padding: 10px; display: inline-block;">
+			<h3 style="font-family: courier">
+				{{image[1]}}
+			</h3>
+			<img src="/uploads/{{image[2]}}" style="width:200px;height:200px;">
+			</div>
+			{% endfor %}
+			
+			<hr>
+			<div class= 'pages'>
+				{{pagination.info}}
+				{{pagination.links}}
+			</div>			
+			
+		</body>
+</html>

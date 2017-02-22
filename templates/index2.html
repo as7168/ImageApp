@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Snapose</title>
+	</head>
+	<body>
+		<header>
+			<div class="header-container">
+				<h1 id="id1" class="title">Snapose</h1>
+				<a href="/images">View Images</a>
+			</div>
+		</header>
+		<main class="main-class">
+			<div class="container1">
+					<h2 class="heading2">This is a simple web application to display pictures you upload</h2>
+					<img src="static/img/badlock.png" alt="lock" style="width:500px;height:300px;">
+			</div>
+			<div class = 'heading'>
+				<h2 class = 'heading2'>
+					Please upload your picture here
+				</h2>
+			</div>
+			<div class='extensionDivision'>
+				<h3 class='heading3'>
+					Only png, jpg, jpeg and gif formats are allowed
+				</h3>
+			</div>
+			<div class = 'upload_div'>
+				<form method="POST" enctype="multipart/form-data">
+					<p><input type="file" name="file" />
+					<input type='text' placeholder="caption" name="caption">
+					<button type="submit">Upload</button>
+				</form>
+			</div>
+			<div class = 'messages', style = 'min-height: 100% width: 80%'>
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						{% for message in messages %}
+							{{ message }}
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+				
+			</div>
+			
+		</main>
+
+	</body>
+</html>

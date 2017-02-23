@@ -47,24 +47,24 @@ def get_images_for_page(all_images, page_number):
 	return new_list
 
 #displaying uploaded images on a page
-@app.route('/images/', defaults={'page':1})
-@app.route('/images/page/<int:page>')
-def display_image(page):
+@app.route('/<user>/images/', defaults={'page':1})
+@app.route('/<user>/images/page/<int:page>')
+def display_image(page, user):
 	c, conn = connection()
-	c.execute('''select MAX(img_id) from images''')
+	c.execute('''select MAX(img_id) from images where usr_name=%s''', (user))
 	maxid = c.fetchone()
-	#print('------------------------------------------>')
+	print('------------------------------------------>')
 	#print maxid
 	#To check if there are any pictures uploaded
 	if maxid[0] == None:
-		return render_template('gallery.html')
+		return render_template('gallery.html', user = user)
 	else:
 		lis = []
 		count = 0
 		id = maxid[0]
 		#lis.append(maxid)
 		while id >= 0 :
-			c.execute('''select * from images where img_id=%s''', (id))
+			c.execute('''select * from images where img_id=%s and usr_name=%s''', (id, user))
 			maxid = c.fetchone()
 			#print maxid
 			lis.append(maxid)
@@ -73,7 +73,7 @@ def display_image(page):
 		images= get_images_for_page(lis, page)
 		#print lis
 		pagination = Pagination(page=page, per_page=PER_PAGE, total=count)
-		return render_template('gallery.html', pagination=pagination, images= images)
+		return render_template('gallery.html', pagination=pagination, images= images, user = user)
 
 #function to get images one at a time
 @app.route('/uploads/<filename>', methods=['GET'])
@@ -83,25 +83,34 @@ def send_image(filename):
 #home page
 #@app.route('/index', methods=['GET', 'POST'])
 @app.route("/", methods=['GET', 'POST'])
-def index():
+def index():	
 	if request.method == 'POST':
-		c, conn = connection()
 		username = request.form['uname']
+		#print('--------------------------------->')
 		password = request.form['pswd']
-		print('-------------------------------------------->')
-		print(username)
-		c.execute('''select passwd from users where username=%s''', username)
-		passwd = c.fetchone()
-		if(passwd == password):
-			return redirect(url_for('user_index', variable = username))
+		if username == '':
+			flash('Please enter a valid username and password')
 		else:
-			flash('Incorrect Password!')
-			redirect(url_for('index'))
+			c, conn = connection()
+			c.execute('''select passwd from users where username=%s''', username)
+			passwd = c.fetchone()
+			print('---------------------------------->')
+			print(passwd)
+			if(passwd is not None):
+				if(str(passwd[0]) == password):
+					flash('Login Successful')
+					return redirect(url_for('user_index', user = username))
+				else:
+					flash('Incorrect Password!')
+					return redirect(url_for('index'))
+			else:
+				flash('Incorrect Password!')
+				return redirect(url_for('index'))
 
 	return render_template("index.html")
 
-@app.route("/user_uploads/", methods=['GET', 'POST'])
-def user_index(variable):
+@app.route("/<user>/", methods=['GET', 'POST'])
+def user_index(user):
 	if request.method == 'POST':
 		#flash('hello')
 		c, conn = connection()
@@ -114,21 +123,21 @@ def user_index(variable):
 		if file.filename == '':
 			flash('No file selected')
 		elif file and check_extension(file.filename):
-			c.execute('''select MAX(img_id) from images''')
+			c.execute('''select MAX(img_id) from images where usr_name=%s''', user)
 			maxid = c.fetchone()
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			if maxid[0] is None:
-				c.execute('''insert into images(caption, path) values(%s, %s)''', (text, filename))
+				c.execute('''insert into images(caption, img_name, img_id, usr_name) values(%s, %s, %s, %s)''', (text, filename, '0', user))
 				conn.commit()
 			else:
-				c.execute('''insert into images(img_id, caption, path) values(%s, %s, %s)''', (maxid[0]+1, text, filename))
+				c.execute('''insert into images(img_id, caption, img_name, usr_name) values(%s, %s, %s, %s)''', (maxid[0]+1, text, filename, user))
 				conn.commit()
-			redirect(url_for('index'))
+			redirect(url_for('user_index', user = user))
 			flash('Upload Complete')
 		else: 
 			flash('File not allowed')
-	return render_template("index.html")
+	return render_template("index2.html", user = user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

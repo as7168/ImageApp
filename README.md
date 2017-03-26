@@ -7,7 +7,8 @@ The devlopment of Snapose was completed in Windows based environment. Python (Fl
 In order to run the application, a database needs to be setup using MySQL with two tables named images and users. The configuration and credentials to access the database needs to be stored in the python file dbCreds.py.
 	
 Tables images and users in the database must have the following columns:
- CREATE TABLE `users` (
+ 
+ >CREATE TABLE `users` (
   `first_name` varchar(50) NOT NULL DEFAULT '',
   `last_name` varchar(50) NOT NULL DEFAULT '',
   `passwd` char(64) NOT NULL,
@@ -15,7 +16,7 @@ Tables images and users in the database must have the following columns:
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
-CREATE TABLE `images` (
+>CREATE TABLE `images` (
   `img_id` int(11) NOT NULL,
   `caption` varchar(255) NOT NULL DEFAULT '',
   `img_name` varchar(100) NOT NULL,

@@ -27,10 +27,10 @@ Tables images and users in the database must have the following columns:
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
 
-************images**************
+#************images**************
 img_id|caption|img_name|usr_name
 
-**************users*****************
+#**************users*****************
 first_name|last_name|passwd|username 
 
 After setting up the database, you need to make sure you have python, and all the python modules that are used in the application installed in your system to make it work.

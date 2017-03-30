@@ -1,5 +1,6 @@
 import os
 import hashlib
+import imghdr
 from flask import Flask, g, session, render_template, request, redirect, url_for, flash, Response, send_from_directory
 from werkzeug.utils import secure_filename
 from flaskext.mysql import MySQL
@@ -10,7 +11,7 @@ from key import SECRET_KEY
 APP_ROOT = os.path.dirname(os.path.abspath(__file__)) 
 #path for the upload folder for uploading images
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'uploads')		
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpeg', 'gif'])
 PER_PAGE = 10
 
 #creating an instance of MySQL 
@@ -24,6 +25,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #this is used to make flash work
 app.secret_key = SECRET_KEY
+app.session_cookie_secure = True
+app.permanent_session_lifetime = 500
+#print(app.permanent_session_lifetime)
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = DATABASE_USER
@@ -43,8 +47,12 @@ def disconnect(conn):
 	conn.close()
 
 #function to check if the uploaded file is allowed by checking its extension
-def check_extension(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def check_file(file):
+	act_file = imghdr.what(file)
+	if act_file in ALLOWED_EXTENSIONS:
+		return True
+	else:
+		return False
 
 #this function takes in all the images and page number and returns the images that are supposed to be on that page number
 def get_images_for_page(all_images, page_number):
@@ -102,35 +110,37 @@ def index():
 #Home page for each user
 @app.route("/user_index", methods=['GET', 'POST'])
 def user_index():
-	if request.method == 'POST':					#if upload button is pressed in idex2.html 
-		if 'file' not in request.files:				#if there is no file in the request
-			flash('No file part')
+	if g.user:
+		if request.method == 'POST':					#if upload button is pressed in idex2.html 
+			if 'file' not in request.files:				#if there is no file in the request
+				flash('No file part')
 
-		file = request.files['file']				#get the uploaded file and caption
-		text = request.form['caption']
+			file = request.files['file']				#get the uploaded file and caption
+			text = request.form['caption'].strip()
 		
-		if file.filename == '':							#if filename is blank, that means no file has been selected
-			flash('No file selected')
-		elif file and check_extension(file.filename):	#check if the file is allowed by checking its extension
-			c, conn = connection()
-			c.execute('''select MAX(img_id) from images where usr_name=%s''', session['user'])			#get the maximum img_id for user = user
-			maxid = c.fetchone()
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))					#save the file in uploads folder if filename is secure and extension is allowed
-			if maxid[0] is None:						#if there are no images in the database insert image in the database with img_id = 0
-				c.execute('''insert into images(caption, img_name, img_id, usr_name) values(%s, %s, %s, %s)''', (text, filename, '0', session['user']))
-				conn.commit()
-			else:										#insert image in the database with img_d = max_id+1
-				c.execute('''insert into images(img_id, caption, img_name, usr_name) values(%s, %s, %s, %s)''', (maxid[0]+1, text, filename, session['user']))
-				conn.commit()
-			disconnect(conn)
-			redirect(url_for('user_index'))
-			flash('Upload Complete')
-		else: 						#if the extension is not allowed
-			flash('File not allowed')
+			if file.filename == '':							#if filename is blank, that means no file has been selected
+				flash('No file selected')
+			elif file and check_file(file):	#check if the file is allowed by checking its extension
+				c, conn = connection()
+				c.execute('''select MAX(img_id) from images where usr_name=%s''', session['user'])			#get the maximum img_id for user = user
+				maxid = c.fetchone()
+				#print os.stat(file)
+				filename = secure_filename(file.filename)
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))					#save the file in uploads folder if filename is secure and extension is allowed
+				if maxid[0] is None:						#if there are no images in the database insert image in the database with img_id = 0
+					c.execute('''insert into images(caption, img_name, img_id, usr_name) values(%s, %s, %s, %s)''', (text, filename, '0', session['user']))
+					conn.commit()
+				else:										#insert image in the database with img_d = max_id+1
+					c.execute('''insert into images(img_id, caption, img_name, usr_name) values(%s, %s, %s, %s)''', (maxid[0]+1, text, filename, session['user']))
+					conn.commit()
+				disconnect(conn)
+				redirect(url_for('user_index'))
+				flash('Upload Complete')
+			else: 						#if the extension is not allowed
+				flash('File not allowed')
 		
 	if g.user:	
-		return render_template("index2.html")
+		return render_template("index2.html", user = session['user'])
 	else:
 		return redirect(url_for('index'))
 

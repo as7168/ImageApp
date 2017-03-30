@@ -39,6 +39,7 @@ flask, werkzeug.utils, flask.ext.mysql, flask_paginate
 After you unzip the file, please make sure, the location of folders and files are not changed and there is an 'uploads' folder in the home directory of the application (the directory where routes.py is located)
 
 Go to the App folder and run the following command:
+	source venv/bin/activate
 	sudo python routes.py
 This command should start a local server on port 5000 and the application should be up and running.
 
